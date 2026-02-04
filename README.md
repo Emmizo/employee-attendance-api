@@ -70,6 +70,25 @@ All tests use Pest and `RefreshDatabase`. Queues and mails are faked where appro
 
 ---
 
+### CI tests on GitHub (GitHub Actions)
+
+This repo includes a GitHub Actions workflow in `.github/workflows/tests.yml` that runs the full test suite on pull requests.
+
+- **When it runs**
+  - On every pull request targeting the `development` or `main` branches.
+
+- **How to see it on GitHub**
+  1. Push your branch to GitHub and open a pull request into `development` or `main`.
+  2. On the PR page, open the **“Checks”** or **“Actions”** tab to see the `Tests` workflow.
+  3. You’ll see live logs for:
+     - `composer install`
+     - `php artisan migrate --force`
+     - `php artisan test`
+
+If the workflow fails, fix the code or tests locally, push new commits to the same branch, and GitHub will re-run the `Tests` workflow automatically.
+
+---
+
 ### Mailpit (viewing emails in Docker)
 
 When running via Sail, Mailpit is already defined in `docker-compose.yml`:
