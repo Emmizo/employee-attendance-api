@@ -3,15 +3,17 @@
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
-    // Public routes
-    Route::post('/auth/register', [App\Http\Controllers\Api\V1\Auth\RegisterController::class, 'register']);
-    Route::post('/auth/login', [App\Http\Controllers\Api\V1\Auth\LoginController::class, 'login']);
-    Route::post('/auth/forgot-password', [App\Http\Controllers\Api\V1\Auth\ForgotPasswordController::class, 'sendResetLink']);
-    Route::post('/auth/reset-password', [App\Http\Controllers\Api\V1\Auth\ResetPasswordController::class, 'reset']);
+    $auth = App\Http\Controllers\Api\V1\Auth\AuthController::class;
+
+    // Public auth routes
+    Route::post('/auth/register', [$auth, 'register']);
+    Route::post('/auth/login', [$auth, 'login']);
+    Route::post('/auth/forgot-password', [$auth, 'sendResetLink']);
+    Route::post('/auth/reset-password', [$auth, 'reset']);
 
     // Protected routes
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/auth/logout', [App\Http\Controllers\Api\V1\Auth\LogoutController::class, 'logout']);
+    Route::middleware('auth:sanctum')->group(function () use ($auth) {
+        Route::post('/auth/logout', [$auth, 'logout']);
 
         Route::middleware('admin')->group(function () {
             Route::get('/employees', [App\Http\Controllers\Api\V1\EmployeeController::class, 'index']);

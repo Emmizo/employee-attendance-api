@@ -1,11 +1,18 @@
 openapi: 3.0.0
+info:
+  title: Employee Attendance API
+  version: 1.0.0
+  description: REST API for managing employees, attendance, and daily attendance reports
+servers:
+  - url: http://localhost:8000
+    description: Local development
 paths:
-  /v1/attendance/check-in:
+  /api/v1/attendance/check-in:
     post:
       tags:
         - Attendance
       summary: 'Check in an employee'
-      operationId: 5ab76563861955d11267487485ba1b36
+      operationId: 687a4f2a1df43ca1081c615e110403db
       responses:
         '201':
           description: 'Checked in'
@@ -15,12 +22,12 @@ paths:
           description: Conflict
         '422':
           description: 'Validation error'
-  /v1/attendance/check-out:
+  /api/v1/attendance/check-out:
     post:
       tags:
         - Attendance
       summary: 'Check out an employee'
-      operationId: 37ec4a362c292365318743351723bc31
+      operationId: e105a11f0b3d48a42178e29d33328682
       responses:
         '200':
           description: 'Checked out'
@@ -30,63 +37,12 @@ paths:
           description: Conflict
         '422':
           description: 'Validation error'
-  /v1/auth/forgot-password:
-    post:
-      tags:
-        - Auth
-      summary: 'Send password reset link'
-      operationId: 2da7f4221d36d1c094034b9f02407fc6
-      responses:
-        '200':
-          description: 'Reset link sent (if email exists)'
-        '422':
-          description: 'Validation error'
-  /v1/auth/login:
-    post:
-      tags:
-        - Auth
-      summary: Login
-      operationId: e9ab2a06b96afc36cf494f9642c1b76e
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  format: email
-                  example: user@example.com
-                password:
-                  type: string
-                  format: password
-                  example: password
-              type: object
-      responses:
-        '200':
-          description: 'Login successful'
-        '401':
-          description: 'Invalid credentials'
-  /v1/auth/logout:
-    post:
-      tags:
-        - Auth
-      summary: Logout
-      operationId: 3e2797e79753f37f51e8e76b57161e5e
-      responses:
-        '200':
-          description: 'Logout successful'
-        '401':
-          description: Unauthenticated
-  /v1/auth/register:
+  /api/v1/auth/register:
     post:
       tags:
         - Auth
       summary: 'Register a new user'
-      operationId: 55f4340a8e621906f099a7faab6fe40c
+      operationId: 7ca6fc7989202054d29707fef91a2d4a
       requestBody:
         required: true
         content:
@@ -119,23 +75,74 @@ paths:
           description: 'User registered successfully'
         '422':
           description: 'Validation error'
-  /v1/auth/reset-password:
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login
+      operationId: 9d0bb5c770cbec19b0b9566606ef4adb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password
+              type: object
+      responses:
+        '200':
+          description: 'Login successful'
+        '401':
+          description: 'Invalid credentials'
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout
+      operationId: 3a27a9e02ceb521eb3f98c8d2394aef9
+      responses:
+        '200':
+          description: 'Logout successful'
+        '401':
+          description: Unauthenticated
+  /api/v1/auth/forgot-password:
+    post:
+      tags:
+        - Auth
+      summary: 'Send password reset link'
+      operationId: 60d704a0913808970fd9d7baadde0662
+      responses:
+        '200':
+          description: 'Reset link sent (if email exists)'
+        '422':
+          description: 'Validation error'
+  /api/v1/auth/reset-password:
     post:
       tags:
         - Auth
       summary: 'Reset password'
-      operationId: 3338fb1f7ac6faa6ce475b32ffd78d4e
+      operationId: b10cb4a66c8bb98c8db204c20e546148
       responses:
         '200':
           description: 'Password reset successful'
         '422':
           description: 'Invalid token / validation error'
-  /v1/employees:
+  /api/v1/employees:
     get:
       tags:
         - Employees
       summary: 'List employees'
-      operationId: db90adfb83dc98d396014bf0013b578d
+      operationId: 326f2e86fa40a9ba88b1cb5f2d4b62b8
       responses:
         '200':
           description: 'Employees list'
@@ -147,7 +154,7 @@ paths:
       tags:
         - Employees
       summary: 'Create employee'
-      operationId: 13d6145a8a12ec0e7849f70f90fef9c8
+      operationId: 4a10b3ada27736863f2586c56b9c19ec
       responses:
         '201':
           description: 'Employee created'
@@ -157,12 +164,12 @@ paths:
           description: Forbidden
         '422':
           description: 'Validation error'
-  '/v1/employees/{id}':
+  '/api/v1/employees/{id}':
     get:
       tags:
         - Employees
       summary: 'Show employee'
-      operationId: 553ec946608033a828dee78911f703b4
+      operationId: b7cb6100cedcac60d8c23d3f9d7c3251
       parameters:
         -
           name: id
@@ -183,7 +190,7 @@ paths:
       tags:
         - Employees
       summary: 'Update employee'
-      operationId: fba46cdfb517ecf300b92bdfba41b868
+      operationId: bcdffcad24dd066f489c0e6ed83861a5
       parameters:
         -
           name: id
@@ -206,7 +213,7 @@ paths:
       tags:
         - Employees
       summary: 'Delete employee'
-      operationId: ffa1bc360631bae0796352a7359afd37
+      operationId: 43aa0966dc246d0b0373a7db65a6bf78
       parameters:
         -
           name: id
@@ -223,12 +230,12 @@ paths:
           description: Forbidden
         '404':
           description: 'Not found'
-  /v1/reports/attendance/daily:
+  /api/v1/reports/attendance/daily:
     get:
       tags:
         - Reports
       summary: 'Daily attendance report (PDF or Excel)'
-      operationId: 6225e90c07e97841a7dd4d565840555d
+      operationId: 6fd430d445fbdd6d7a7f21ac45ebc183
       parameters:
         -
           name: date
@@ -255,10 +262,9 @@ tags:
   -
     name: Attendance
   -
-    name: Employees
-  -
     name: Auth
-    description: Auth
+  -
+    name: Employees
   -
     name: Reports
     description: Reports

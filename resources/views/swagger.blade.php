@@ -14,8 +14,30 @@
 <script>
     window.onload = () => {
         SwaggerUIBundle({
-            url: '/openapi.yaml', // generated OpenAPI spec in public/
-            dom_id: '#swagger-ui'
+            url: '/openapi.yaml',
+            dom_id: '#swagger-ui',
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIBundle.presets.standalone
+            ],
+            layout: 'StandaloneLayout',
+            deepLinking: true,
+            tryItOutEnabled: true,
+            requestInterceptor: (request) => {
+                // Add any default headers if needed
+                return request;
+            },
+            onComplete: () => {
+                console.log('Swagger UI loaded successfully');
+            },
+            onFailure: (data) => {
+                console.error('Swagger UI failed to load:', data);
+                document.getElementById('swagger-ui').innerHTML = 
+                    '<div style="padding: 20px; text-align: center;">' +
+                    '<h2>Failed to load API documentation</h2>' +
+                    '<p>Please check the console for errors.</p>' +
+                    '</div>';
+            }
         });
     };
 </script>

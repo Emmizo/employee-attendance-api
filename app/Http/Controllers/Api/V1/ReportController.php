@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
 
 class ReportController extends Controller
 {
-    #[OA\Get(path: '/v1/reports/attendance/daily', summary: 'Daily attendance report (PDF or Excel)', tags: ['Reports'])]
+    #[OA\Get(path: '/api/v1/reports/attendance/daily', summary: 'Daily attendance report (PDF or Excel)', tags: ['Reports'])]
     #[OA\Parameter(name: 'date', in: 'query', required: false, schema: new OA\Schema(type: 'string', format: 'date'))]
     #[OA\Parameter(name: 'format', in: 'query', required: false, schema: new OA\Schema(type: 'string', enum: ['pdf', 'xlsx']))]
     #[OA\Response(response: 200, description: 'Report file stream')]

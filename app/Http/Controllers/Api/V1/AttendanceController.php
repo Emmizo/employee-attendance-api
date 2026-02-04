@@ -16,7 +16,7 @@ class AttendanceController extends Controller
     {
     }
 
-    #[OA\Post(path: '/v1/attendance/check-in', summary: 'Check in an employee', tags: ['Attendance'])]
+    #[OA\Post(path: '/api/v1/attendance/check-in', summary: 'Check in an employee', tags: ['Attendance'])]
     #[OA\Response(response: 201, description: 'Checked in')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
     #[OA\Response(response: 409, description: 'Conflict')]
@@ -40,7 +40,7 @@ class AttendanceController extends Controller
         ]);
     }
 
-    #[OA\Post(path: '/v1/attendance/check-out', summary: 'Check out an employee', tags: ['Attendance'])]
+    #[OA\Post(path: '/api/v1/attendance/check-out', summary: 'Check out an employee', tags: ['Attendance'])]
     #[OA\Response(response: 200, description: 'Checked out')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
     #[OA\Response(response: 409, description: 'Conflict')]

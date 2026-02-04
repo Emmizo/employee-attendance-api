@@ -18,7 +18,7 @@ class EmployeeController extends Controller
     {
     }
 
-    #[OA\Get(path: '/v1/employees', summary: 'List employees', tags: ['Employees'])]
+    #[OA\Get(path: '/api/v1/employees', summary: 'List employees', tags: ['Employees'])]
     #[OA\Response(response: 200, description: 'Employees list')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
     #[OA\Response(response: 403, description: 'Forbidden')]
@@ -29,7 +29,7 @@ class EmployeeController extends Controller
         return $this->success(EmployeeResource::collection($paginator)->response()->getData(true));
     }
 
-    #[OA\Post(path: '/v1/employees', summary: 'Create employee', tags: ['Employees'])]
+    #[OA\Post(path: '/api/v1/employees', summary: 'Create employee', tags: ['Employees'])]
     #[OA\Response(response: 201, description: 'Employee created')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
     #[OA\Response(response: 403, description: 'Forbidden')]
@@ -41,7 +41,7 @@ class EmployeeController extends Controller
         return $this->created(new EmployeeResource($employee));
     }
 
-    #[OA\Get(path: '/v1/employees/{id}', summary: 'Show employee', tags: ['Employees'])]
+    #[OA\Get(path: '/api/v1/employees/{id}', summary: 'Show employee', tags: ['Employees'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Employee')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
@@ -52,7 +52,7 @@ class EmployeeController extends Controller
         return $this->success(new EmployeeResource($employee));
     }
 
-    #[OA\Put(path: '/v1/employees/{id}', summary: 'Update employee', tags: ['Employees'])]
+    #[OA\Put(path: '/api/v1/employees/{id}', summary: 'Update employee', tags: ['Employees'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Employee updated')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
         return $this->success(new EmployeeResource($employee));
     }
 
-    #[OA\Delete(path: '/v1/employees/{id}', summary: 'Delete employee', tags: ['Employees'])]
+    #[OA\Delete(path: '/api/v1/employees/{id}', summary: 'Delete employee', tags: ['Employees'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Employee deleted')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
