@@ -1,0 +1,264 @@
+openapi: 3.0.0
+paths:
+  /v1/attendance/check-in:
+    post:
+      tags:
+        - Attendance
+      summary: 'Check in an employee'
+      operationId: 5ab76563861955d11267487485ba1b36
+      responses:
+        '201':
+          description: 'Checked in'
+        '401':
+          description: Unauthenticated
+        '409':
+          description: Conflict
+        '422':
+          description: 'Validation error'
+  /v1/attendance/check-out:
+    post:
+      tags:
+        - Attendance
+      summary: 'Check out an employee'
+      operationId: 37ec4a362c292365318743351723bc31
+      responses:
+        '200':
+          description: 'Checked out'
+        '401':
+          description: Unauthenticated
+        '409':
+          description: Conflict
+        '422':
+          description: 'Validation error'
+  /v1/auth/forgot-password:
+    post:
+      tags:
+        - Auth
+      summary: 'Send password reset link'
+      operationId: 2da7f4221d36d1c094034b9f02407fc6
+      responses:
+        '200':
+          description: 'Reset link sent (if email exists)'
+        '422':
+          description: 'Validation error'
+  /v1/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login
+      operationId: e9ab2a06b96afc36cf494f9642c1b76e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password
+              type: object
+      responses:
+        '200':
+          description: 'Login successful'
+        '401':
+          description: 'Invalid credentials'
+  /v1/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout
+      operationId: 3e2797e79753f37f51e8e76b57161e5e
+      responses:
+        '200':
+          description: 'Logout successful'
+        '401':
+          description: Unauthenticated
+  /v1/auth/register:
+    post:
+      tags:
+        - Auth
+      summary: 'Register a new user'
+      operationId: 55f4340a8e621906f099a7faab6fe40c
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+                - email
+                - password
+                - password_confirmation
+              properties:
+                name:
+                  type: string
+                  example: 'John Doe'
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: password
+              type: object
+      responses:
+        '201':
+          description: 'User registered successfully'
+        '422':
+          description: 'Validation error'
+  /v1/auth/reset-password:
+    post:
+      tags:
+        - Auth
+      summary: 'Reset password'
+      operationId: 3338fb1f7ac6faa6ce475b32ffd78d4e
+      responses:
+        '200':
+          description: 'Password reset successful'
+        '422':
+          description: 'Invalid token / validation error'
+  /v1/employees:
+    get:
+      tags:
+        - Employees
+      summary: 'List employees'
+      operationId: db90adfb83dc98d396014bf0013b578d
+      responses:
+        '200':
+          description: 'Employees list'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden
+    post:
+      tags:
+        - Employees
+      summary: 'Create employee'
+      operationId: 13d6145a8a12ec0e7849f70f90fef9c8
+      responses:
+        '201':
+          description: 'Employee created'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden
+        '422':
+          description: 'Validation error'
+  '/v1/employees/{id}':
+    get:
+      tags:
+        - Employees
+      summary: 'Show employee'
+      operationId: 553ec946608033a828dee78911f703b4
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Employee
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Not found'
+    put:
+      tags:
+        - Employees
+      summary: 'Update employee'
+      operationId: fba46cdfb517ecf300b92bdfba41b868
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Employee updated'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Not found'
+        '422':
+          description: 'Validation error'
+    delete:
+      tags:
+        - Employees
+      summary: 'Delete employee'
+      operationId: ffa1bc360631bae0796352a7359afd37
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Employee deleted'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Not found'
+  /v1/reports/attendance/daily:
+    get:
+      tags:
+        - Reports
+      summary: 'Daily attendance report (PDF or Excel)'
+      operationId: 6225e90c07e97841a7dd4d565840555d
+      parameters:
+        -
+          name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        -
+          name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+      responses:
+        '200':
+          description: 'Report file stream'
+        '401':
+          description: Unauthenticated
+tags:
+  -
+    name: Attendance
+  -
+    name: Employees
+  -
+    name: Auth
+    description: Auth
+  -
+    name: Reports
+    description: Reports
