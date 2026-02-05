@@ -4,8 +4,8 @@ info:
   version: 1.0.0
   description: REST API for managing employees, attendance, and daily attendance reports
 servers:
-  - url: http://localhost:8000
-    description: Local development
+  - url: http://localhost
+    description: Local development (Sail)
 paths:
   /api/v1/attendance/check-in:
     post:

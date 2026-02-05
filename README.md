@@ -117,7 +117,25 @@ To use it:
    ./vendor/bin/sail up -d
    ```
 
-3. Trigger actions that send mail (e.g. forgot password, attendance notifications) and open `http://localhost:8025` to see the messages in Mailpit.
+3. **Start the queue worker** (emails are queued):
+
+   ```bash
+   ./vendor/bin/sail artisan queue:work
+   ```
+
+   Or run it in the background:
+
+   ```bash
+   ./vendor/bin/sail artisan queue:work &
+   ```
+
+4. Trigger actions that send mail:
+   - **Register a user** (`POST /api/v1/auth/register`) → Welcome email
+   - **Forgot password** (`POST /api/v1/auth/forgot-password`) → Password reset token email
+   - **Reset password** (`POST /api/v1/auth/reset-password`) → Password reset confirmation email
+   - **Attendance check-in/check-out** → Attendance notification emails
+
+5. Open `http://localhost:8025` to see all emails in Mailpit's web interface.
 
 ---
 

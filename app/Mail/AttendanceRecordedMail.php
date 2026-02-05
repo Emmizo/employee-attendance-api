@@ -25,7 +25,11 @@ class AttendanceRecordedMail extends Mailable implements ShouldQueue
             : 'Attendance check-in recorded';
 
         return $this->subject($subject)
-            ->text('emails.attendance-recorded-text');
+            ->view('emails.attendance-recorded-text')
+            ->with([
+                'attendance' => $this->attendance,
+                'type' => $this->type,
+            ]);
     }
 }
 

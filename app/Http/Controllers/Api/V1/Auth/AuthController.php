@@ -7,11 +7,13 @@ use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
+use App\Mail\PasswordResetConfirmationMail;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
@@ -115,15 +117,17 @@ class AuthController extends Controller
     public function reset(ResetPasswordRequest $request): JsonResponse
     {
         $payload = $request->validated();
+        $user = null;
 
         $status = Password::broker()->reset(
             $payload,
-            function ($user) use ($payload): void {
-                $user->forceFill([
+            function ($resetUser) use ($payload, &$user): void {
+                $resetUser->forceFill([
                     'password' => Hash::make($payload['password']),
                     'remember_token' => Str::random(60),
                 ])->save();
-                $user->tokens()->delete();
+                $resetUser->tokens()->delete();
+                $user = $resetUser;
             }
         );
 
@@ -131,6 +135,11 @@ class AuthController extends Controller
             return $this->error('Unable to reset password', 422, [
                 'email' => [__($status)],
             ]);
+        }
+
+        // Send confirmation email
+        if ($user !== null) {
+            Mail::to($user->email)->send(new PasswordResetConfirmationMail($user));
         }
 
         return $this->success([

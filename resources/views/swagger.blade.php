@@ -11,6 +11,7 @@
 <div id="swagger-ui"></div>
 
 <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
 <script>
     window.onload = () => {
         SwaggerUIBundle({
@@ -18,13 +19,12 @@
             dom_id: '#swagger-ui',
             presets: [
                 SwaggerUIBundle.presets.apis,
-                SwaggerUIBundle.presets.standalone
+                SwaggerUIStandalonePreset
             ],
             layout: 'StandaloneLayout',
             deepLinking: true,
             tryItOutEnabled: true,
             requestInterceptor: (request) => {
-                // Add any default headers if needed
                 return request;
             },
             onComplete: () => {
