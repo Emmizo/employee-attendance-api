@@ -5,6 +5,13 @@ on:
     branches:
       - development
       - main
+      - master
+
+  push:
+    branches:
+      - development
+      - main
+      - master
 
 jobs:
   pest:

@@ -2,62 +2,107 @@
 
 Backend-only REST API for managing employees, attendance, and daily attendance reports, built with **Laravel 12**, **PHP 8.3**, **Sanctum**, **Pest**, **Laravel Excel**, and **laravel-snappy**.
 
-### Local setup
+## Run the project with Sail (Docker) (recommended)
 
-- **1. Install dependencies**
+### Prerequisites
 
-  ```bash
-  composer install
-  ```
+- **Docker Desktop** (or Docker Engine) installed and running
+- **Docker Compose** available (Docker Desktop includes it)
 
-- **2. Create environment file**
+### Quick start (fresh setup)
 
-  ```bash
-  cp .env.example .env
-  ```
+From the project root:
 
-- **3. Generate the application key (fixes `MissingAppKeyException`)**
+1) **Install PHP dependencies (creates `vendor/` and Sail binary)**
 
-  If running Laravel directly:
+- If you already have PHP + Composer on your machine:
 
-  ```bash
-  php artisan key:generate
-  ```
+```bash
+composer install
+```
 
-  If running via Sail:
+- If you do NOT have PHP/Composer locally, install via a Composer container:
 
-  ```bash
-  ./vendor/bin/sail artisan key:generate
-  ```
+```bash
+docker run --rm -u "$(id -u):$(id -g)" -v "$PWD:/app" -w /app composer:2 composer install
+```
 
-  After this, your `.env` must contain a non-empty `APP_KEY=base64:...` value.
+2) **Create `.env` from `.env.example`**
 
-- **4. Run migrations**
+```bash
+cp .env.example .env
+```
 
-  ```bash
-  php artisan migrate
-  # or, with Sail:
-  ./vendor/bin/sail artisan migrate
-  ```
+3) **Start Sail**
 
-- **5. Run the app**
+```bash
+./vendor/bin/sail up -d
+```
 
-  ```bash
-  # Local PHP on port 8001
-  php artisan serve --port=8001
+4) **Generate `APP_KEY`**
 
-  # Or, with Sail on port 8000
-  ./vendor/bin/sail up -d
-  ```
+```bash
+./vendor/bin/sail artisan key:generate
+```
 
-Visit the API at:
+5) **Run migrations (and optional seed data)**
 
-- `http://localhost:8001/api/v1` when running **locally** with `php artisan serve --port=8001`
-- `http://localhost:8000/api/v1` when running via **Sail** (Docker)
+- Migrate only:
 
----
+```bash
+./vendor/bin/sail artisan migrate
+```
 
-### Demo / test data
+- Or reset + seed demo data (recommended for first run):
+
+```bash
+./vendor/bin/sail artisan migrate:fresh --seed
+```
+
+This will:
+
+- Create all tables
+- Insert a default **admin user** (`admin@example.com` / `password123`)
+- Insert example **employees** and **attendance records** you can use immediately in the API and reports
+
+### URLs (when running with Sail)
+
+- **API base**: `http://localhost:8000/api/v1`
+- **Swagger / API docs**: `http://localhost:8000/docs`
+- **Mailpit UI**: `http://localhost:8025`
+
+### Common Sail commands
+
+```bash
+./vendor/bin/sail ps
+./vendor/bin/sail down
+./vendor/bin/sail artisan tinker
+./vendor/bin/sail artisan test
+```
+
+### Notes about `.env` (important)
+
+This repo ships with a working `.env.example` for Sail. After copying it to `.env`, these are the key values:
+
+- **APP_URL**: should match your local URL (default `http://localhost:8000`)
+- **APP_PORT**: controls the exposed port (default `8000`)
+- **Database**: Sail uses the `mysql` service name as host:
+  - `DB_HOST=mysql`
+  - `DB_DATABASE=employee_attendance`
+  - `DB_USERNAME=sail`
+  - `DB_PASSWORD=password`
+- **Mailpit** (already set):
+  - `MAIL_HOST=mailpit`
+  - `MAIL_PORT=1025`
+
+If port `8000` is busy on your machine, change `APP_PORT=8000` in `.env` to another port (e.g. `APP_PORT=8080`), then restart Sail:
+
+```bash
+./vendor/bin/sail down
+./vendor/bin/sail up -d
+```
+
+## Demo / test data
 
 - **Admin user (for protected endpoints & employees)**
 
@@ -218,3 +263,33 @@ Daily attendance report:
 - Query params:
   - `date` (optional, `Y-m-d`, defaults to today)
   - `format` = `pdf` (default) or `xlsx`
+
+#### PDF reports (wkhtmltopdf inside Sail)
+
+PDF generation uses `laravel-snappy` (wkhtmltopdf). When running via Sail, the `wkhtmltopdf` binary must exist inside the `laravel.test` container.
+
+If you change the Sail runtime Dockerfile (or pull updates that include it), rebuild once:
+
+```bash
+./vendor/bin/sail down
+./vendor/bin/sail build --no-cache
+./vendor/bin/sail up -d
+```
+
+Then you can download a PDF:
+
+```bash
+curl -H "Authorization: Bearer <TOKEN>" \
+  "http://localhost:8000/api/v1/reports/attendance/daily?date=2026-02-06&format=pdf" \
+  -o daily-attendance.pdf
+```
+
+#### Excel reports (XLSX)
+
+Excel export uses `maatwebsite/excel` and does **not** require wkhtmltopdf:
+
+```bash
+curl -H "Authorization: Bearer <TOKEN>" \
+  "http://localhost:8000/api/v1/reports/attendance/daily?date=2026-02-06&format=xlsx" \
+  -o daily-attendance.xlsx
+```
