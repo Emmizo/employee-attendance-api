@@ -12,6 +12,7 @@ class Attendance extends Model
 
     protected $fillable = [
         'employee_id',
+        'user_id',
         'checked_in_at',
         'checked_out_at',
         'notes',
@@ -28,6 +29,11 @@ class Attendance extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function isOpen(): bool

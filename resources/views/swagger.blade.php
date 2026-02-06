@@ -24,6 +24,8 @@
             layout: 'StandaloneLayout',
             deepLinking: true,
             tryItOutEnabled: true,
+            // Keep the Authorization token when you refresh the page
+            persistAuthorization: true,
             requestInterceptor: (request) => {
                 return request;
             },

@@ -32,7 +32,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     {
         return Attendance::whereDate('checked_in_at', $date->toDateString())
             ->with('employee')
-            ->orderBy('checked_in_at')
+            ->orderByDesc('checked_in_at')
             ->get();
     }
 

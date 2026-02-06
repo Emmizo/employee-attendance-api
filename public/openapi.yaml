@@ -4,8 +4,8 @@ info:
   version: 1.0.0
   description: REST API for managing employees, attendance, and daily attendance reports
 servers:
-  - url: http://localhost
-    description: Local development (Sail)
+  - url: http://localhost:8000
+    description: Local development (Sail on port 8000)
 paths:
   /api/v1/attendance/check-in:
     post:
@@ -13,6 +13,27 @@ paths:
         - Attendance
       summary: 'Check in an employee'
       operationId: 687a4f2a1df43ca1081c615e110403db
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employee_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                employee_identifier:
+                  type: string
+                  nullable: true
+                  example: EMP-001
+                notes:
+                  type: string
+                  nullable: true
+                  example: Arrived on time
       responses:
         '201':
           description: 'Checked in'
@@ -28,6 +49,27 @@ paths:
         - Attendance
       summary: 'Check out an employee'
       operationId: e105a11f0b3d48a42178e29d33328682
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employee_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                employee_identifier:
+                  type: string
+                  nullable: true
+                  example: EMP-001
+                notes:
+                  type: string
+                  nullable: true
+                  example: Left early for appointment
       responses:
         '200':
           description: 'Checked out'
@@ -110,17 +152,70 @@ paths:
         - Auth
       summary: Logout
       operationId: 3a27a9e02ceb521eb3f98c8d2394aef9
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: 'Logout successful'
         '401':
           description: Unauthenticated
+  /api/v1/auth/change-password:
+    post:
+      tags:
+        - Auth
+      summary: 'Change password (authenticated user)'
+      operationId: 6f96a3b0b2f84701a445ef61a34e0cbe
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - current_password
+                - password
+                - password_confirmation
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                  example: old-password
+                password:
+                  type: string
+                  format: password
+                  example: new-password
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: new-password
+      responses:
+        '200':
+          description: 'Password changed successfully'
+        '401':
+          description: 'Unauthenticated'
+        '422':
+          description: 'Validation error / wrong current password'
   /api/v1/auth/forgot-password:
     post:
       tags:
         - Auth
       summary: 'Send password reset link'
       operationId: 60d704a0913808970fd9d7baadde0662
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
       responses:
         '200':
           description: 'Reset link sent (if email exists)'
@@ -132,6 +227,33 @@ paths:
         - Auth
       summary: 'Reset password'
       operationId: b10cb4a66c8bb98c8db204c20e546148
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - email
+                - password
+                - password_confirmation
+              properties:
+                token:
+                  type: string
+                  example: reset-token-from-email
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: new-password
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: new-password
       responses:
         '200':
           description: 'Password reset successful'
@@ -143,6 +265,8 @@ paths:
         - Employees
       summary: 'List employees'
       operationId: 326f2e86fa40a9ba88b1cb5f2d4b62b8
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: 'Employees list'
@@ -155,6 +279,33 @@ paths:
         - Employees
       summary: 'Create employee'
       operationId: 4a10b3ada27736863f2586c56b9c19ec
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - employee_identifier
+              properties:
+                name:
+                  type: string
+                  example: Jane Doe
+                email:
+                  type: string
+                  format: email
+                  example: employee@example.com
+                employee_identifier:
+                  type: string
+                  example: EMP-001
+                phone_number:
+                  type: string
+                  nullable: true
+                  example: "+250788000000"
       responses:
         '201':
           description: 'Employee created'
@@ -186,6 +337,8 @@ paths:
           description: Forbidden
         '404':
           description: 'Not found'
+      security:
+        - bearerAuth: []
     put:
       tags:
         - Employees
@@ -198,6 +351,27 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Jane Doe
+                email:
+                  type: string
+                  format: email
+                  example: employee@example.com
+                employee_identifier:
+                  type: string
+                  example: EMP-001
+                phone_number:
+                  type: string
+                  nullable: true
+                  example: "+250788000000"
       responses:
         '200':
           description: 'Employee updated'
@@ -209,6 +383,8 @@ paths:
           description: 'Not found'
         '422':
           description: 'Validation error'
+      security:
+        - bearerAuth: []
     delete:
       tags:
         - Employees
@@ -230,6 +406,8 @@ paths:
           description: Forbidden
         '404':
           description: 'Not found'
+      security:
+        - bearerAuth: []
   /api/v1/reports/attendance/daily:
     get:
       tags:
@@ -258,6 +436,8 @@ paths:
           description: 'Report file stream'
         '401':
           description: Unauthenticated
+      security:
+        - bearerAuth: []
 tags:
   -
     name: Attendance
@@ -268,3 +448,9 @@ tags:
   -
     name: Reports
     description: Reports
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "Token"

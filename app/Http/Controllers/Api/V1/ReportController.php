@@ -19,8 +19,11 @@ class ReportController extends Controller
     #[OA\Response(response: 401, description: 'Unauthenticated')]
     public function dailyAttendance(Request $request)
     {
-        $date = $request->query('date');
-        $date = $date ? Carbon::parse($date) : today();
+        $rawDate = $request->query('date');
+        // Treat missing or empty date as "today" to avoid parse errors
+        $date = ($rawDate === null || $rawDate === '')
+            ? today()
+            : Carbon::parse($rawDate);
         $format = $request->query('format', 'pdf');
 
         if ($format === 'xlsx') {
@@ -30,7 +33,7 @@ class ReportController extends Controller
         $attendances = Attendance::query()
             ->with('employee')
             ->whereDate('checked_in_at', $date->toDateString())
-            ->orderBy('checked_in_at')
+            ->orderByDesc('checked_in_at')
             ->get();
 
         $pdf = SnappyPdf::loadView('reports.daily-attendance', [

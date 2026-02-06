@@ -43,12 +43,69 @@ Backend-only REST API for managing employees, attendance, and daily attendance r
 - **5. Run the app**
 
   ```bash
-  php artisan serve
-  # or, with Sail:
+  # Local PHP on port 8001
+  php artisan serve --port=8001
+
+  # Or, with Sail on port 8000
   ./vendor/bin/sail up -d
   ```
 
-Visit the API at `http://localhost/api/v1` (or `http://localhost:8080/api/v1` when using Sail).
+Visit the API at:
+
+- `http://localhost:8001/api/v1` when running **locally** with `php artisan serve --port=8001`
+- `http://localhost:8000/api/v1` when running via **Sail** (Docker)
+
+---
+
+### Demo / test data
+
+- **Admin user (for protected endpoints & employees)**
+
+  After running migrations with seed:
+
+  ```bash
+  ./vendor/bin/sail artisan migrate:fresh --seed
+  ```
+
+  You can log in with:
+
+  - Email: `admin@example.com`
+  - Password: `password123`
+
+  Use this account to:
+
+  - Call `POST /api/v1/auth/login` → get an admin token
+  - Click **Authorize** in Swagger and paste the token (no `Bearer ` prefix)
+  - Call employee, attendance and reports endpoints as an admin.
+
+- **Sample employee payload**
+
+  ```json
+  {
+    "name": "Kwizera Emmanuel",
+    "email": "emmizokwizera@gmail.com",
+    "employee_identifier": "EMP-001",
+    "phone_number": "+250788000000"
+  }
+  ```
+
+- **Sample attendance payloads**
+
+  ```json
+  {
+    "employee_id": 1,
+    "notes": "Arrived on time"
+  }
+  ```
+
+  or
+
+  ```json
+  {
+    "employee_identifier": "EMP-001",
+    "notes": "Left early for appointment"
+  }
+  ```
 
 ---
 
@@ -117,25 +174,13 @@ To use it:
    ./vendor/bin/sail up -d
    ```
 
-3. **Start the queue worker** (emails are queued):
-
-   ```bash
-   ./vendor/bin/sail artisan queue:work
-   ```
-
-   Or run it in the background:
-
-   ```bash
-   ./vendor/bin/sail artisan queue:work &
-   ```
-
-4. Trigger actions that send mail:
+3. Trigger actions that send mail:
    - **Register a user** (`POST /api/v1/auth/register`) → Welcome email
    - **Forgot password** (`POST /api/v1/auth/forgot-password`) → Password reset token email
    - **Reset password** (`POST /api/v1/auth/reset-password`) → Password reset confirmation email
    - **Attendance check-in/check-out** → Attendance notification emails
 
-5. Open `http://localhost:8025` to see all emails in Mailpit's web interface.
+4. Open `http://localhost:8025` to see all emails in Mailpit's web interface.
 
 ---
 

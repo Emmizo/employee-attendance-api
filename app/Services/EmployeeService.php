@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Employee;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeService
 {
@@ -20,6 +21,8 @@ class EmployeeService
 
     public function create(array $data): Employee
     {
+        $data['created_by'] = Auth::id();
+
         return $this->employees->create($data);
     }
 

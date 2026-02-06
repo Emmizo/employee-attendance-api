@@ -14,6 +14,7 @@ Route::prefix('v1')->group(function () {
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () use ($auth) {
         Route::post('/auth/logout', [$auth, 'logout']);
+        Route::post('/auth/change-password', [$auth, 'changePassword']);
 
         Route::middleware('admin')->group(function () {
             Route::get('/employees', [App\Http\Controllers\Api\V1\EmployeeController::class, 'index']);

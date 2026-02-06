@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Repositories\Contracts\AttendanceRepositoryInterface;
 use App\Services\Contracts\AttendanceNotifierInterface;
 use App\Services\Exceptions\AttendanceConflictException;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceService
 {
@@ -25,6 +26,7 @@ class AttendanceService
 
         $attendance = $this->attendances->create([
             'employee_id' => $employee->id,
+            'user_id' => Auth::id(),
             'checked_in_at' => now(),
             'checked_out_at' => null,
             'notes' => $notes,

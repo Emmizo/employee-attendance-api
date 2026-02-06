@@ -11,12 +11,12 @@ class EmployeeRepository implements EmployeeRepositoryInterface
 {
     public function all(): Collection
     {
-        return Employee::all();
+        return Employee::orderByDesc('id')->get();
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Employee::paginate($perPage);
+        return Employee::orderByDesc('id')->paginate($perPage);
     }
 
     public function find(int $id): ?Employee

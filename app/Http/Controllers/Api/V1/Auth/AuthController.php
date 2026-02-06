@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
+use App\Http\Requests\Api\V1\Auth\ChangePasswordRequest;
 use App\Mail\PasswordResetConfirmationMail;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -99,7 +100,47 @@ class AuthController extends Controller
         ]);
     }
 
+    #[OA\Post(path: '/api/v1/auth/change-password', summary: 'Change password (authenticated user)', tags: ['Auth'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(required: ['current_password', 'password', 'password_confirmation'], properties: [
+        new OA\Property(property: 'current_password', type: 'string', format: 'password', example: 'old-password'),
+        new OA\Property(property: 'password', type: 'string', format: 'password', example: 'new-password'),
+        new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', example: 'new-password'),
+    ]))]
+    #[OA\Response(response: 200, description: 'Password changed successfully')]
+    #[OA\Response(response: 401, description: 'Unauthenticated')]
+    #[OA\Response(response: 422, description: 'Validation error / wrong current password')]
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        if ($user === null) {
+            return $this->error('Unauthenticated', 401);
+        }
+
+        if (! Hash::check($request->input('current_password'), $user->password)) {
+            return $this->error('The current password is incorrect.', 422);
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($request->input('password')),
+        ])->save();
+
+        // Optionally invalidate other tokens to force re-login elsewhere.
+        $user->tokens()->delete();
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return $this->success([
+            'message' => 'Password changed successfully.',
+            'token' => $token,
+            'token_type' => 'Bearer',
+        ]);
+    }
+
     #[OA\Post(path: '/api/v1/auth/forgot-password', summary: 'Send password reset link', tags: ['Auth'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(required: ['email'], properties: [
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'user@example.com'),
+    ]))]
     #[OA\Response(response: 200, description: 'Reset link sent (if email exists)')]
     #[OA\Response(response: 422, description: 'Validation error')]
     public function sendResetLink(ForgotPasswordRequest $request): JsonResponse
@@ -112,6 +153,12 @@ class AuthController extends Controller
     }
 
     #[OA\Post(path: '/api/v1/auth/reset-password', summary: 'Reset password', tags: ['Auth'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(required: ['token', 'email', 'password', 'password_confirmation'], properties: [
+        new OA\Property(property: 'token', type: 'string', example: 'reset-token-from-email'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'user@example.com'),
+        new OA\Property(property: 'password', type: 'string', format: 'password', example: 'new-password'),
+        new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', example: 'new-password'),
+    ]))]
     #[OA\Response(response: 200, description: 'Password reset successful')]
     #[OA\Response(response: 422, description: 'Invalid token / validation error')]
     public function reset(ResetPasswordRequest $request): JsonResponse

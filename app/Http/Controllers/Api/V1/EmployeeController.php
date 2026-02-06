@@ -30,6 +30,12 @@ class EmployeeController extends Controller
     }
 
     #[OA\Post(path: '/api/v1/employees', summary: 'Create employee', tags: ['Employees'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(required: ['name', 'email', 'employee_identifier'], properties: [
+        new OA\Property(property: 'name', type: 'string', example: 'Jane Doe'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'employee@example.com'),
+        new OA\Property(property: 'employee_identifier', type: 'string', example: 'EMP-001'),
+        new OA\Property(property: 'phone_number', type: 'string', nullable: true, example: '+250788000000'),
+    ]))]
     #[OA\Response(response: 201, description: 'Employee created')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
     #[OA\Response(response: 403, description: 'Forbidden')]
@@ -54,6 +60,12 @@ class EmployeeController extends Controller
 
     #[OA\Put(path: '/api/v1/employees/{id}', summary: 'Update employee', tags: ['Employees'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
+        new OA\Property(property: 'name', type: 'string', example: 'Jane Doe'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'employee@example.com'),
+        new OA\Property(property: 'employee_identifier', type: 'string', example: 'EMP-001'),
+        new OA\Property(property: 'phone_number', type: 'string', nullable: true, example: '+250788000000'),
+    ]))]
     #[OA\Response(response: 200, description: 'Employee updated')]
     #[OA\Response(response: 401, description: 'Unauthenticated')]
     #[OA\Response(response: 403, description: 'Forbidden')]

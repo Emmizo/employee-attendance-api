@@ -10,7 +10,7 @@ services:
         WWWGROUP: '${WWWGROUP:-1000}'
     image: employee-attendance-api
     ports:
-      - '${APP_PORT:-8080}:80'
+      - '${APP_PORT:-8000}:80'
     environment:
       WWWUSER: '${WWWUSER:-1000}'
       LARAVEL_SAIL: 1

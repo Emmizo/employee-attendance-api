@@ -22,14 +22,24 @@ class QueuedResetPasswordNotification extends Notification implements ShouldQueu
 
     public function toMail(object $notifiable): MailMessage
     {
-        // API is stateless; we do not rely on the default frontend reset URL.
-        // Consumers can use the token + email with /v1/auth/reset-password.
+        $email = method_exists($notifiable, 'getEmailForPasswordReset')
+            ? $notifiable->getEmailForPasswordReset()
+            : ($notifiable->email ?? '');
+
+        // Base URL for the reset page (frontend or API client UI).
+        // You can override via PASSWORD_RESET_URL in .env, otherwise defaults to {APP_URL}/reset-password.
+        $baseUrl = env('PASSWORD_RESET_URL', rtrim(config('app.url'), '/') . '/reset-password');
+
+        $resetUrl = $baseUrl.'?token='.urlencode($this->token).'&email='.urlencode($email);
+
         return (new MailMessage)
-            ->subject('Reset Password Notification')
-            ->line('You are receiving this email because we received a password reset request for your account.')
-            ->line('Use the token below to reset your password via the API:')
-            ->line($this->token)
-            ->line('If you did not request a password reset, no further action is required.');
+            ->subject('Reset your Employee Attendance password')
+            ->view('emails.password-reset-link', [
+                'resetUrl' => $resetUrl,
+                'token' => $this->token,
+                'email' => $email,
+                'name' => $notifiable->name ?? $email,
+            ]);
     }
 }
 
