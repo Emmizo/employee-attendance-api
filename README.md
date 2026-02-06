@@ -188,6 +188,51 @@ All tests use Pest and `RefreshDatabase`. Queues and mails are faked where appro
 
 ---
 
+### How to manually verify each feature
+
+- **Authentication (Sanctum, stateless)**
+  1. Start Sail and ensure DB is migrated/seeded.
+  2. In Swagger at `http://localhost:8000/docs`, call `POST /api/v1/auth/login` with the seeded admin (`admin@example.com` / `password123`).
+  3. Copy the returned `token`, click **Authorize** in Swagger, and paste the token (no `Bearer ` prefix).
+  4. Call `POST /api/v1/auth/logout`, `POST /api/v1/auth/forgot-password`, and `POST /api/v1/auth/reset-password` to see stateless auth flows.
+
+- **Employee CRUD**
+  1. With the admin token authorized in Swagger, call:
+     - `GET /api/v1/employees` → should return a paginated list.
+     - `POST /api/v1/employees` → create using the **Sample employee payload** above.
+     - `GET /api/v1/employees/{id}`, `PUT /api/v1/employees/{id}`, `DELETE /api/v1/employees/{id}`.
+  2. Repeat as a non-admin user (register + login) to confirm 403 responses on employee endpoints.
+
+- **Attendance management + queued emails**
+  1. Use an existing employee id or the `employee_identifier` from the sample payload.
+  2. Call:
+     - `POST /api/v1/attendance/check-in` with one of the **Sample attendance payloads**.
+     - `POST /api/v1/attendance/check-out` for the same employee.
+  3. Open `http://localhost:8025` (Mailpit) and confirm attendance emails were queued and delivered.
+
+- **Reports (PDF & Excel)**
+  1. Ensure there is attendance data for today (either from the seeder or by creating check-ins/outs).
+  2. With an authenticated token, call:
+     - `GET /api/v1/reports/attendance/daily?format=pdf`
+     - `GET /api/v1/reports/attendance/daily?format=xlsx`
+  3. You should receive a file download in each case (browser) or a file when using the `curl` commands shown below.
+
+- **OpenAPI docs (PHP 8 attributes)**
+  1. Visit `http://localhost:8000/docs` while Sail is running.
+  2. Confirm that all endpoints (Auth, Employees, Attendance, Reports) are listed with schemas and example payloads.
+
+- **GitHub Actions (Tests workflow)**
+  1. Push a commit or open a pull request targeting `master`.
+  2. On GitHub, go to the **Actions** tab and open the latest `Tests` workflow run.
+  3. Verify that steps run in order:
+     - `composer install`
+     - `php artisan key:generate`
+     - `php artisan migrate --force` (against a MySQL service)
+     - `php artisan test`
+  4. A green checkmark indicates all automated tests passed for that branch/PR.
+
+---
+
 ### CI tests on GitHub (GitHub Actions)
 
 This repo includes a GitHub Actions workflow in `.github/workflows/tests.yml` that runs the full test suite on pull requests.
