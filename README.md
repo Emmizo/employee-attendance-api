@@ -4,6 +4,22 @@ Backend-only REST API for managing employees, attendance, and daily attendance r
 
 ## Run the project with Sail (Docker) (recommended)
 
+### Repository location & terminal path
+
+All commands below assume you have the project cloned here:
+
+```bash
+~/employee-attendance-api
+```
+
+From any terminal, first move into the project root:
+
+```bash
+cd ~/employee-attendance-api
+```
+
+You should see files like `composer.json`, `docker-compose.yml`, and `README.md` when you run `ls` in this folder.
+
 ### Prerequisites
 
 - **Docker Desktop** (or Docker Engine) installed and running
